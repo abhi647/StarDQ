@@ -13,6 +13,7 @@ import {
   Cog,
   ChevronRight,
   ChevronDown,
+  Wand2,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useUIStore } from '@/stores'
@@ -24,6 +25,7 @@ const iconMap: Record<string, any> = {
   LayoutDashboard,
   Database,
   GitBranch,
+  Wand2,
   ShieldCheck,
   Sparkles,
   FileText,

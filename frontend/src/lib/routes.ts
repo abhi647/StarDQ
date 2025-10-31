@@ -28,6 +28,11 @@ export const sidebarRoutes: RouteConfig[] = [
     icon: 'GitBranch',
   },
   {
+    path: '/data-cleaning',
+    label: 'Data Cleaning',
+    icon: 'Wand2',
+  },
+  {
     path: '/pii-masking',
     label: 'PII Masking',
     icon: 'ShieldCheck',

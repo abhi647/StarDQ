@@ -11,7 +11,8 @@ import {
   AIInsights,
   PIIMasking,
   Reports,
-  Settings
+  Settings,
+  DataCleaning
 } from './pages'
 import { validateEnv } from './lib/env'
 
@@ -45,6 +46,7 @@ function App() {
             <Route path="/data-catalog" element={<DataCatalog />} />
             <Route path="/datasets/:id" element={<DatasetDetail />} />
             <Route path="/dqa-pipeline" element={<DQAPipeline />} />
+            <Route path="/data-cleaning" element={<DataCleaning />} />
             <Route path="/pii-masking" element={<PIIMasking />} />
             <Route path="/ai-insights" element={<AIInsights />} />
             <Route path="/dq-reports" element={<Reports />} />
