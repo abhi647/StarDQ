@@ -19,11 +19,12 @@
   }
 
   * {
-    @apply border-border;
+    border-color: #A8DCDB;
   }
 
   body {
-    @apply bg-background text-foreground;
+    background-color: #FFFFFF;
+    color: #012F35;
     font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     font-size: 16px;
     line-height: 1.5;
@@ -40,22 +41,22 @@
   }
 
   h1 {
-    @apply text-h1;
+    font-size: 30px;
   }
 
   h2 {
-    @apply text-h2;
+    font-size: 24px;
   }
 
   h3 {
-    @apply text-h3;
+    font-size: 20px;
   }
 }
 
 @layer utilities {
   /* Accessibility - focus visible */
   .focus-visible-ring {
-    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007787] focus-visible:ring-offset-2;
   }
 
   /* Animations */
