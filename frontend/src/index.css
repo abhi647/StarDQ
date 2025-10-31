@@ -55,12 +55,17 @@
 
 @layer utilities {
   /* Accessibility - focus visible */
-  .focus-visible-ring {
-    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007787] focus-visible:ring-offset-2;
+  .focus-visible-ring:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px #007787, 0 0 0 4px rgba(0, 119, 135, 0.2);
   }
 
   /* Animations */
   .animate-hover-rise {
-    @apply transition-transform duration-200 hover:-translate-y-1;
+    transition: transform 200ms;
+  }
+
+  .animate-hover-rise:hover {
+    transform: translateY(-4px);
   }
 }
