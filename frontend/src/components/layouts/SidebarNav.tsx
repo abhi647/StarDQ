@@ -36,7 +36,7 @@ const iconMap: Record<string, any> = {
 
 export function SidebarNav() {
   const { sidebarCollapsed } = useUIStore()
-  const { hasAnyRole } = useAuth()
+  const { hasAnyRole, user } = useAuth()
   const [expandedSections, setExpandedSections] = useState<string[]>([])
 
   const toggleSection = (path: string) => {
@@ -46,7 +46,11 @@ export function SidebarNav() {
   }
 
   const canAccessRoute = (roles?: string[]) => {
+    // Show all routes if no roles required
     if (!roles || roles.length === 0) return true
+    // Show all routes if not authenticated (for development)
+    if (!user) return true
+    // Check roles if authenticated
     return hasAnyRole(roles as any)
   }
 

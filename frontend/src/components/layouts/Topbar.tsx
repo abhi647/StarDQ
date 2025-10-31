@@ -53,23 +53,37 @@ export function Topbar() {
 
         {/* User Menu */}
         <div className="flex items-center gap-3">
-          <div className="flex flex-col items-end">
-            <span className="text-sm font-medium">{user?.name || 'Guest User'}</span>
-            {user?.role && <RoleTag role={user.role} />}
-          </div>
-          <button
-            className="p-2 hover:bg-muted rounded-full transition-colors focus-visible-ring"
-            aria-label="User menu"
-          >
-            <User size={20} />
-          </button>
-          <button
-            onClick={logout}
-            className="p-2 hover:bg-danger/10 text-danger rounded-lg transition-colors focus-visible-ring"
-            aria-label="Logout"
-          >
-            <LogOut size={18} />
-          </button>
+          {user ? (
+            <>
+              <div className="flex flex-col items-end">
+                <span className="text-sm font-medium">{user.name}</span>
+                <RoleTag role={user.role} />
+              </div>
+              <button
+                className="p-2 hover:bg-muted rounded-full transition-colors focus-visible-ring"
+                aria-label="User menu"
+              >
+                <User size={20} />
+              </button>
+              <button
+                onClick={logout}
+                className="p-2 hover:bg-danger/10 text-danger rounded-lg transition-colors focus-visible-ring"
+                aria-label="Logout"
+              >
+                <LogOut size={18} />
+              </button>
+            </>
+          ) : (
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">Guest User</span>
+              <button
+                className="p-2 hover:bg-muted rounded-full transition-colors focus-visible-ring"
+                aria-label="User menu"
+              >
+                <User size={20} />
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </header>
