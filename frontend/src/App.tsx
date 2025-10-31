@@ -1,7 +1,18 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AppShell } from './components/layouts'
-import { Dashboard, DataCatalog, DatasetDetail } from './pages'
+import {
+  Dashboard,
+  DataCatalog,
+  DatasetDetail,
+  DQAPipeline,
+  MonitoringAlerts,
+  RuleStudio,
+  AIInsights,
+  PIIMasking,
+  Reports,
+  Settings
+} from './pages'
 import { validateEnv } from './lib/env'
 
 // Validate environment variables on app load (only warns in development)
@@ -33,6 +44,12 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/data-catalog" element={<DataCatalog />} />
             <Route path="/datasets/:id" element={<DatasetDetail />} />
+            <Route path="/dqa-pipeline" element={<DQAPipeline />} />
+            <Route path="/pii-masking" element={<PIIMasking />} />
+            <Route path="/ai-insights" element={<AIInsights />} />
+            <Route path="/dq-reports" element={<Reports />} />
+            <Route path="/alerts" element={<MonitoringAlerts />} />
+            <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<div className="p-6">404 - Page Not Found</div>} />
           </Routes>
         </AppShell>
