@@ -1,46 +1,41 @@
-import { cva, type VariantProps } from 'class-variance-authority'
-import { cn } from '@/lib/utils'
 import type { Badge } from '@/types'
 
-const badgeVariants = cva(
-  'inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold transition-colors',
-  {
-    variants: {
-      variant: {
-        bronze: 'bg-warning text-warning-foreground',
-        silver: 'bg-muted text-muted-foreground',
-        gold: 'bg-accent text-accent-foreground',
-      },
-      size: {
-        sm: 'px-2 py-0.5 text-[10px]',
-        md: 'px-3 py-1 text-xs',
-        lg: 'px-4 py-1.5 text-sm',
-      },
-    },
-    defaultVariants: {
-      variant: 'bronze',
-      size: 'md',
-    },
-  }
-)
-
-export interface BadgePillProps
-  extends React.HTMLAttributes<HTMLSpanElement>,
-    VariantProps<typeof badgeVariants> {
+export interface BadgePillProps extends React.HTMLAttributes<HTMLSpanElement> {
   badge: Badge
+  size?: 'sm' | 'md' | 'lg'
 }
 
-const badgeToVariant: Record<Badge, 'bronze' | 'silver' | 'gold'> = {
-  Bronze: 'bronze',
-  Silver: 'silver',
-  Gold: 'gold',
+const badgeStyles: Record<Badge, { bg: string; color: string }> = {
+  Bronze: { bg: '#FFC994', color: '#012F35' },
+  Silver: { bg: '#A8DCDB', color: '#012F35' },
+  Gold: { bg: '#007787', color: 'white' },
 }
 
-export function BadgePill({ badge, size, className, ...props }: BadgePillProps) {
-  const variant = badgeToVariant[badge]
+const sizeStyles = {
+  sm: { padding: '2px 8px', fontSize: '10px' },
+  md: { padding: '4px 12px', fontSize: '12px' },
+  lg: { padding: '6px 16px', fontSize: '14px' },
+}
+
+export function BadgePill({ badge, size = 'md', style, ...props }: BadgePillProps) {
+  const badgeStyle = badgeStyles[badge]
+  const sizeStyle = sizeStyles[size]
 
   return (
-    <span className={cn(badgeVariants({ variant, size }), className)} {...props}>
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        borderRadius: '9999px',
+        fontWeight: '600',
+        transition: 'all 0.2s',
+        backgroundColor: badgeStyle.bg,
+        color: badgeStyle.color,
+        ...sizeStyle,
+        ...style,
+      }}
+      {...props}
+    >
       {badge}
     </span>
   )

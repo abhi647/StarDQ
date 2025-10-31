@@ -56,21 +56,32 @@ export function SidebarNav() {
 
   return (
     <aside
-      className={cn(
-        'bg-primary text-primary-foreground h-screen transition-all duration-300 flex flex-col',
-        sidebarCollapsed ? 'w-16' : 'w-64'
-      )}
+      style={{
+        backgroundColor: '#012F35',
+        color: 'white',
+        height: '100vh',
+        transition: 'all 0.3s',
+        display: 'flex',
+        flexDirection: 'column',
+        width: sidebarCollapsed ? '64px' : '256px',
+      }}
     >
       {/* Logo */}
-      <div className="p-4 border-b border-secondary">
-        <h1 className={cn('font-heading font-bold', sidebarCollapsed ? 'text-sm' : 'text-xl')}>
+      <div style={{ padding: '16px', borderBottom: '1px solid #1B4E54' }}>
+        <h1
+          style={{
+            fontFamily: 'Bw Gradual, Segoe UI, system-ui, sans-serif',
+            fontWeight: 'bold',
+            fontSize: sidebarCollapsed ? '14px' : '20px',
+          }}
+        >
           {sidebarCollapsed ? 'SDQ' : 'StarDQ 2.0'}
         </h1>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto py-4">
-        <ul className="space-y-1 px-2">
+      <nav style={{ flex: 1, overflowY: 'auto', paddingTop: '16px', paddingBottom: '16px' }}>
+        <ul style={{ display: 'flex', flexDirection: 'column', gap: '4px', padding: '0 8px' }}>
           {sidebarRoutes.map(route => {
             if (!canAccessRoute(route.roles)) return null
 
@@ -84,15 +95,28 @@ export function SidebarNav() {
                   <>
                     <button
                       onClick={() => toggleSection(route.path)}
-                      className={cn(
-                        'w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-secondary transition-colors text-left',
-                        sidebarCollapsed && 'justify-center'
-                      )}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        padding: '8px 12px',
+                        borderRadius: '8px',
+                        backgroundColor: 'transparent',
+                        color: 'white',
+                        border: 'none',
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        transition: 'background-color 0.2s',
+                        justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1B4E54'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                     >
                       {Icon && <Icon size={20} />}
                       {!sidebarCollapsed && (
                         <>
-                          <span className="flex-1">{route.label}</span>
+                          <span style={{ flex: 1 }}>{route.label}</span>
                           {isExpanded ? (
                             <ChevronDown size={16} />
                           ) : (
@@ -102,19 +126,26 @@ export function SidebarNav() {
                       )}
                     </button>
                     {isExpanded && !sidebarCollapsed && (
-                      <ul className="ml-4 mt-1 space-y-1">
+                      <ul style={{ marginLeft: '16px', marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
                         {route.children?.map(child => {
                           if (!canAccessRoute(child.roles)) return null
                           return (
                             <li key={child.path}>
                               <NavLink
                                 to={child.path}
-                                className={({ isActive }) =>
-                                  cn(
-                                    'flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-secondary transition-colors text-sm',
-                                    isActive && 'bg-accent font-semibold'
-                                  )
-                                }
+                                style={({ isActive }) => ({
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '12px',
+                                  padding: '8px 12px',
+                                  borderRadius: '8px',
+                                  backgroundColor: isActive ? '#007787' : 'transparent',
+                                  color: 'white',
+                                  textDecoration: 'none',
+                                  fontSize: '14px',
+                                  transition: 'background-color 0.2s',
+                                  fontWeight: isActive ? '600' : '400',
+                                })}
                               >
                                 {child.label}
                               </NavLink>
@@ -127,13 +158,19 @@ export function SidebarNav() {
                 ) : (
                   <NavLink
                     to={route.path}
-                    className={({ isActive }) =>
-                      cn(
-                        'flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-secondary transition-colors',
-                        isActive && 'bg-accent font-semibold',
-                        sidebarCollapsed && 'justify-center'
-                      )
-                    }
+                    style={({ isActive }) => ({
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      padding: '8px 12px',
+                      borderRadius: '8px',
+                      backgroundColor: isActive ? '#007787' : 'transparent',
+                      color: 'white',
+                      textDecoration: 'none',
+                      transition: 'background-color 0.2s',
+                      fontWeight: isActive ? '600' : '400',
+                      justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
+                    })}
                     title={sidebarCollapsed ? route.label : undefined}
                   >
                     {Icon && <Icon size={20} />}

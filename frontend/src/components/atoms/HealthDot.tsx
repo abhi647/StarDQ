@@ -1,4 +1,3 @@
-import { cn } from '@/lib/utils'
 import type { HealthStatus } from '@/types'
 
 export interface HealthDotProps {
@@ -9,10 +8,10 @@ export interface HealthDotProps {
   size?: 'sm' | 'md' | 'lg'
 }
 
-const statusStyles: Record<HealthStatus, string> = {
-  healthy: 'bg-green-500',
-  degraded: 'bg-yellow-500',
-  down: 'bg-red-500',
+const statusColors: Record<HealthStatus, string> = {
+  healthy: '#10b981',
+  degraded: '#eab308',
+  down: '#ef4444',
 }
 
 const statusLabels: Record<HealthStatus, string> = {
@@ -21,10 +20,10 @@ const statusLabels: Record<HealthStatus, string> = {
   down: 'Down',
 }
 
-const sizeStyles = {
-  sm: 'h-2 w-2',
-  md: 'h-3 w-3',
-  lg: 'h-4 w-4',
+const sizes = {
+  sm: 8,
+  md: 12,
+  lg: 16,
 }
 
 export function HealthDot({
@@ -34,14 +33,24 @@ export function HealthDot({
   className,
   size = 'md',
 }: HealthDotProps) {
+  const dotSize = sizes[size]
+
   return (
-    <div className={cn('flex items-center gap-2', className)}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }} className={className}>
       <span
-        className={cn('rounded-full animate-pulse', statusStyles[status], sizeStyles[size])}
+        style={{
+          width: `${dotSize}px`,
+          height: `${dotSize}px`,
+          borderRadius: '9999px',
+          backgroundColor: statusColors[status],
+          animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        }}
         aria-label={label || statusLabels[status]}
       />
       {showLabel && (
-        <span className="text-sm text-muted-foreground">{label || statusLabels[status]}</span>
+        <span style={{ fontSize: '14px', color: '#A8DCDB' }}>
+          {label || statusLabels[status]}
+        </span>
       )}
     </div>
   )
