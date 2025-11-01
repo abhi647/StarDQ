@@ -12,7 +12,12 @@ import {
   ArrowRight,
   Clock,
   Shield,
-  GitBranch
+  GitBranch,
+  Target,
+  AlertCircle,
+  FileWarning,
+  Copy,
+  Zap
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
@@ -33,6 +38,53 @@ export function Dashboard() {
     : 0
   const healthyDatasets = datasets.filter(d => d.qualityScore >= 0.9).length
   const criticalAlerts = alerts.filter(a => a.severity === 'high' && !a.ackBy).length
+
+  // Mock data for quality trends (last 7 days)
+  const qualityTrends = [
+    { day: 'Mon', score: 87.2 },
+    { day: 'Tue', score: 88.5 },
+    { day: 'Wed', score: 89.1 },
+    { day: 'Thu', score: 88.8 },
+    { day: 'Fri', score: 90.3 },
+    { day: 'Sat', score: 91.2 },
+    { day: 'Sun', score: (avgQualityScore * 100) }
+  ]
+
+  // Mock issue distribution data
+  const issueDistribution = [
+    { type: 'Missing Values', count: 245, color: '#ef4444', percent: 32 },
+    { type: 'Invalid Format', count: 189, color: '#FFA500', percent: 25 },
+    { type: 'Duplicates', count: 156, color: '#00B3CA', percent: 20 },
+    { type: 'Outliers', count: 98, color: '#007787', percent: 13 },
+    { type: 'Inconsistencies', count: 76, color: '#1B4E54', percent: 10 }
+  ]
+
+  // Calculate domain health
+  const domainHealth = datasets.reduce((acc, dataset) => {
+    if (!acc[dataset.domain]) {
+      acc[dataset.domain] = { count: 0, totalScore: 0 }
+    }
+    acc[dataset.domain].count++
+    acc[dataset.domain].totalScore += dataset.qualityScore
+    return acc
+  }, {} as Record<string, { count: number; totalScore: number }>)
+
+  const domainHealthArray = Object.entries(domainHealth).map(([domain, data]) => ({
+    domain,
+    avgScore: (data.totalScore / data.count) * 100,
+    count: data.count
+  })).sort((a, b) => b.avgScore - a.avgScore)
+
+  // Calculate overall data completeness
+  const avgCompleteness = datasets.length > 0
+    ? datasets.reduce((acc, d) => acc + d.profile.completeness, 0) / datasets.length
+    : 0
+  const avgValidity = datasets.length > 0
+    ? datasets.reduce((acc, d) => acc + d.profile.validity, 0) / datasets.length
+    : 0
+  const avgUniqueness = datasets.length > 0
+    ? datasets.reduce((acc, d) => acc + d.profile.uniqueness, 0) / datasets.length
+    : 0
 
   return (
     <div style={{
@@ -211,7 +263,345 @@ export function Dashboard() {
         </div>
       </div>
 
+      {/* Quality Trends Chart */}
+      <div style={{
+        backgroundColor: 'white',
+        borderRadius: '12px',
+        padding: '24px',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+        border: '1px solid #E2E8F0',
+        marginBottom: '24px'
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+          <div>
+            <h2 style={{ fontSize: '20px', fontWeight: '600', color: '#012F35', marginBottom: '4px' }}>
+              Quality Score Trends
+            </h2>
+            <p style={{ fontSize: '14px', color: '#64748B' }}>
+              Last 7 days performance overview
+            </p>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <TrendingUp size={20} style={{ color: '#10b981' }} />
+            <span style={{ fontSize: '16px', fontWeight: '600', color: '#10b981' }}>
+              +{(qualityTrends[6].score - qualityTrends[0].score).toFixed(1)}%
+            </span>
+          </div>
+        </div>
+        <div style={{ position: 'relative', height: '200px' }}>
+          {/* Y-axis labels */}
+          <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '40px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', paddingBottom: '24px' }}>
+            {[100, 90, 80, 70, 60].map(val => (
+              <div key={val} style={{ fontSize: '12px', color: '#64748B', textAlign: 'right', paddingRight: '8px' }}>
+                {val}
+              </div>
+            ))}
+          </div>
+          {/* Chart area */}
+          <div style={{ marginLeft: '50px', height: '100%', position: 'relative', borderLeft: '1px solid #E2E8F0', borderBottom: '1px solid #E2E8F0', paddingBottom: '24px' }}>
+            {/* Grid lines */}
+            {[0, 1, 2, 3, 4].map(i => (
+              <div key={i} style={{
+                position: 'absolute',
+                top: `${i * 25}%`,
+                left: 0,
+                right: 0,
+                borderTop: '1px dashed #E2E8F0'
+              }} />
+            ))}
+            {/* Data points and line */}
+            <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: 'calc(100% - 24px)' }}>
+              <defs>
+                <linearGradient id="lineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" style={{ stopColor: '#00B3CA', stopOpacity: 0.3 }} />
+                  <stop offset="100%" style={{ stopColor: '#00B3CA', stopOpacity: 0 }} />
+                </linearGradient>
+              </defs>
+              {/* Area under line */}
+              <path
+                d={`M 0 ${176 - (qualityTrends[0].score - 60) * 4.4} ${qualityTrends.map((d, i) =>
+                  `L ${(i * 100 / 6)}% ${176 - (d.score - 60) * 4.4}`
+                ).join(' ')} L 100% 176 L 0 176 Z`}
+                fill="url(#lineGradient)"
+              />
+              {/* Line */}
+              <polyline
+                points={qualityTrends.map((d, i) =>
+                  `${(i * 100 / 6)}%,${176 - (d.score - 60) * 4.4}`
+                ).join(' ')}
+                fill="none"
+                stroke="#00B3CA"
+                strokeWidth="3"
+              />
+              {/* Points */}
+              {qualityTrends.map((d, i) => (
+                <circle
+                  key={i}
+                  cx={`${(i * 100 / 6)}%`}
+                  cy={176 - (d.score - 60) * 4.4}
+                  r="5"
+                  fill="white"
+                  stroke="#00B3CA"
+                  strokeWidth="3"
+                />
+              ))}
+            </svg>
+            {/* X-axis labels */}
+            <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, display: 'flex', justifyContent: 'space-between' }}>
+              {qualityTrends.map((d, i) => (
+                <div key={i} style={{ fontSize: '12px', color: '#64748B', textAlign: 'center', flex: 1 }}>
+                  {d.day}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Data Quality Metrics Gauges */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(3, 1fr)',
+        gap: '20px',
+        marginBottom: '24px'
+      }}>
+        {/* Completeness Gauge */}
+        <div style={{
+          backgroundColor: 'white',
+          borderRadius: '12px',
+          padding: '24px',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+          border: '1px solid #E2E8F0'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+            <Target size={20} style={{ color: '#10b981' }} />
+            <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#012F35' }}>Completeness</h3>
+          </div>
+          <div style={{ position: 'relative', width: '120px', height: '120px', margin: '0 auto' }}>
+            <svg width="120" height="120" viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="50" fill="none" stroke="#E2E8F0" strokeWidth="10" />
+              <circle
+                cx="60"
+                cy="60"
+                r="50"
+                fill="none"
+                stroke="#10b981"
+                strokeWidth="10"
+                strokeDasharray={`${avgCompleteness * 314} 314`}
+                strokeLinecap="round"
+                transform="rotate(-90 60 60)"
+              />
+            </svg>
+            <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center' }}>
+              <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#012F35' }}>
+                {(avgCompleteness * 100).toFixed(0)}%
+              </div>
+            </div>
+          </div>
+          <p style={{ textAlign: 'center', fontSize: '12px', color: '#64748B', marginTop: '12px' }}>
+            Average data completeness across all datasets
+          </p>
+        </div>
+
+        {/* Validity Gauge */}
+        <div style={{
+          backgroundColor: 'white',
+          borderRadius: '12px',
+          padding: '24px',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+          border: '1px solid #E2E8F0'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+            <CheckCircle size={20} style={{ color: '#00B3CA' }} />
+            <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#012F35' }}>Validity</h3>
+          </div>
+          <div style={{ position: 'relative', width: '120px', height: '120px', margin: '0 auto' }}>
+            <svg width="120" height="120" viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="50" fill="none" stroke="#E2E8F0" strokeWidth="10" />
+              <circle
+                cx="60"
+                cy="60"
+                r="50"
+                fill="none"
+                stroke="#00B3CA"
+                strokeWidth="10"
+                strokeDasharray={`${avgValidity * 314} 314`}
+                strokeLinecap="round"
+                transform="rotate(-90 60 60)"
+              />
+            </svg>
+            <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center' }}>
+              <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#012F35' }}>
+                {(avgValidity * 100).toFixed(0)}%
+              </div>
+            </div>
+          </div>
+          <p style={{ textAlign: 'center', fontSize: '12px', color: '#64748B', marginTop: '12px' }}>
+            Average data validity across all datasets
+          </p>
+        </div>
+
+        {/* Uniqueness Gauge */}
+        <div style={{
+          backgroundColor: 'white',
+          borderRadius: '12px',
+          padding: '24px',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+          border: '1px solid #E2E8F0'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+            <Zap size={20} style={{ color: '#FFA500' }} />
+            <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#012F35' }}>Uniqueness</h3>
+          </div>
+          <div style={{ position: 'relative', width: '120px', height: '120px', margin: '0 auto' }}>
+            <svg width="120" height="120" viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="50" fill="none" stroke="#E2E8F0" strokeWidth="10" />
+              <circle
+                cx="60"
+                cy="60"
+                r="50"
+                fill="none"
+                stroke="#FFA500"
+                strokeWidth="10"
+                strokeDasharray={`${avgUniqueness * 314} 314`}
+                strokeLinecap="round"
+                transform="rotate(-90 60 60)"
+              />
+            </svg>
+            <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center' }}>
+              <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#012F35' }}>
+                {(avgUniqueness * 100).toFixed(0)}%
+              </div>
+            </div>
+          </div>
+          <p style={{ textAlign: 'center', fontSize: '12px', color: '#64748B', marginTop: '12px' }}>
+            Average data uniqueness across all datasets
+          </p>
+        </div>
+      </div>
+
       {/* Main Content Grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
+        {/* Issue Distribution */}
+        <div style={{
+          backgroundColor: 'white',
+          borderRadius: '12px',
+          padding: '24px',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+          border: '1px solid #E2E8F0'
+        }}>
+          <h2 style={{ fontSize: '20px', fontWeight: '600', color: '#012F35', marginBottom: '20px' }}>
+            Issue Distribution
+          </h2>
+          <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
+            {/* Donut Chart */}
+            <div style={{ position: 'relative', width: '180px', height: '180px' }}>
+              <svg width="180" height="180" viewBox="0 0 180 180">
+                {issueDistribution.reduce((acc, issue, idx) => {
+                  const prevPercent = issueDistribution.slice(0, idx).reduce((sum, i) => sum + i.percent, 0)
+                  const dashArray = `${issue.percent * 5.65} 565`
+                  const rotation = (prevPercent * 3.6) - 90
+
+                  return [
+                    ...acc,
+                    <circle
+                      key={idx}
+                      cx="90"
+                      cy="90"
+                      r="90"
+                      fill="none"
+                      stroke={issue.color}
+                      strokeWidth="35"
+                      strokeDasharray={dashArray}
+                      transform={`rotate(${rotation} 90 90)`}
+                      opacity="0.9"
+                    />
+                  ]
+                }, [] as JSX.Element[])}
+                <circle cx="90" cy="90" r="55" fill="white" />
+              </svg>
+              <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center' }}>
+                <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#012F35' }}>
+                  {issueDistribution.reduce((sum, i) => sum + i.count, 0)}
+                </div>
+                <div style={{ fontSize: '12px', color: '#64748B' }}>Total Issues</div>
+              </div>
+            </div>
+            {/* Legend */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {issueDistribution.map((issue, idx) => (
+                <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{
+                    width: '16px',
+                    height: '16px',
+                    borderRadius: '4px',
+                    backgroundColor: issue.color
+                  }} />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: '14px', fontWeight: '500', color: '#012F35' }}>
+                      {issue.type}
+                    </div>
+                    <div style={{ fontSize: '12px', color: '#64748B' }}>
+                      {issue.count} issues ({issue.percent}%)
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Domain Health Overview */}
+        <div style={{
+          backgroundColor: 'white',
+          borderRadius: '12px',
+          padding: '24px',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+          border: '1px solid #E2E8F0'
+        }}>
+          <h2 style={{ fontSize: '20px', fontWeight: '600', color: '#012F35', marginBottom: '20px' }}>
+            Domain Health Overview
+          </h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {domainHealthArray.length > 0 ? domainHealthArray.map((domain, idx) => (
+              <div key={idx}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Database size={16} style={{ color: '#007787' }} />
+                    <span style={{ fontSize: '14px', fontWeight: '500', color: '#012F35' }}>
+                      {domain.domain}
+                    </span>
+                    <span style={{ fontSize: '12px', color: '#64748B' }}>
+                      ({domain.count} datasets)
+                    </span>
+                  </div>
+                  <span style={{ fontSize: '16px', fontWeight: '600', color: domain.avgScore >= 90 ? '#10b981' : domain.avgScore >= 75 ? '#FFA500' : '#ef4444' }}>
+                    {domain.avgScore.toFixed(1)}%
+                  </span>
+                </div>
+                <div style={{ position: 'relative', height: '8px', backgroundColor: '#E2E8F0', borderRadius: '4px', overflow: 'hidden' }}>
+                  <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    height: '100%',
+                    width: `${domain.avgScore}%`,
+                    backgroundColor: domain.avgScore >= 90 ? '#10b981' : domain.avgScore >= 75 ? '#FFA500' : '#ef4444',
+                    transition: 'width 0.3s ease',
+                    borderRadius: '4px'
+                  }} />
+                </div>
+              </div>
+            )) : (
+              <div style={{ textAlign: 'center', padding: '32px', color: '#64748B' }}>
+                No domain data available
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Quality Distribution & Recent Activity */}
       <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px', marginBottom: '24px' }}>
         {/* Quality Distribution */}
         <div style={{
