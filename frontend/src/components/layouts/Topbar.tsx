@@ -1,7 +1,6 @@
 import { Menu, Bell, User, Sparkles, LogOut } from 'lucide-react'
 import { useUIStore, useAlertsStore, useAuthStore } from '@/stores'
 import { RoleTag } from '@/components/atoms'
-import { cn } from '@/lib/utils'
 
 export function Topbar() {
   const { toggleSidebar, toggleCopilot, copilotOpen } = useUIStore()
@@ -9,12 +8,33 @@ export function Topbar() {
   const { user, logout } = useAuthStore()
 
   return (
-    <header className="bg-surface border-b border-border h-16 flex items-center justify-between px-6">
+    <header style={{
+      backgroundColor: '#F8F9FA',
+      borderBottom: '1px solid #E2E8F0',
+      height: '64px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      padding: '0 24px'
+    }}>
       {/* Left section */}
-      <div className="flex items-center gap-4">
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
         <button
           onClick={toggleSidebar}
-          className="p-2 hover:bg-muted rounded-lg transition-colors focus-visible-ring"
+          style={{
+            padding: '8px',
+            backgroundColor: 'transparent',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'background-color 0.2s',
+            color: '#012F35'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#E2E8F0'}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
           aria-label="Toggle sidebar"
         >
           <Menu size={20} />
@@ -22,62 +42,141 @@ export function Topbar() {
       </div>
 
       {/* Right section */}
-      <div className="flex items-center gap-4">
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
         {/* AI Copilot Toggle */}
         <button
           onClick={toggleCopilot}
-          className={cn(
-            'flex items-center gap-2 px-3 py-2 rounded-lg transition-colors focus-visible-ring',
-            copilotOpen
-              ? 'bg-accent text-accent-foreground'
-              : 'hover:bg-muted text-muted-foreground'
-          )}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '8px 12px',
+            borderRadius: '8px',
+            border: 'none',
+            cursor: 'pointer',
+            transition: 'all 0.2s',
+            backgroundColor: copilotOpen ? '#007787' : 'transparent',
+            color: copilotOpen ? 'white' : '#64748B'
+          }}
+          onMouseEnter={(e) => {
+            if (!copilotOpen) e.currentTarget.style.backgroundColor = '#E2E8F0'
+          }}
+          onMouseLeave={(e) => {
+            if (!copilotOpen) e.currentTarget.style.backgroundColor = 'transparent'
+          }}
           aria-label="Toggle AI Copilot"
         >
           <Sparkles size={18} />
-          <span className="text-sm font-medium">AI Copilot</span>
+          <span style={{ fontSize: '14px', fontWeight: '500' }}>AI Copilot</span>
         </button>
 
         {/* Alerts */}
         <button
-          className="relative p-2 hover:bg-muted rounded-lg transition-colors focus-visible-ring"
+          style={{
+            position: 'relative',
+            padding: '8px',
+            backgroundColor: 'transparent',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'background-color 0.2s',
+            color: '#012F35'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#E2E8F0'}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
           aria-label={`Alerts (${unreadCount} unread)`}
         >
           <Bell size={20} />
           {unreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 bg-danger text-danger-foreground text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+            <span style={{
+              position: 'absolute',
+              top: '-4px',
+              right: '-4px',
+              backgroundColor: '#ef4444',
+              color: 'white',
+              fontSize: '11px',
+              fontWeight: 'bold',
+              borderRadius: '50%',
+              height: '20px',
+              width: '20px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
               {unreadCount > 9 ? '9+' : unreadCount}
             </span>
           )}
         </button>
 
         {/* User Menu */}
-        <div className="flex items-center gap-3">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           {user ? (
             <>
-              <div className="flex flex-col items-end">
-                <span className="text-sm font-medium">{user.name}</span>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                <span style={{ fontSize: '14px', fontWeight: '500', color: '#012F35' }}>{user.name}</span>
                 <RoleTag role={user.role} />
               </div>
               <button
-                className="p-2 hover:bg-muted rounded-full transition-colors focus-visible-ring"
+                style={{
+                  padding: '8px',
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  borderRadius: '50%',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'background-color 0.2s',
+                  color: '#012F35'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#E2E8F0'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                 aria-label="User menu"
               >
                 <User size={20} />
               </button>
               <button
                 onClick={logout}
-                className="p-2 hover:bg-danger/10 text-danger rounded-lg transition-colors focus-visible-ring"
+                style={{
+                  padding: '8px',
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'background-color 0.2s',
+                  color: '#ef4444'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#FEE2E2'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                 aria-label="Logout"
               >
                 <LogOut size={18} />
               </button>
             </>
           ) : (
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">Guest User</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '14px', color: '#64748B' }}>Guest User</span>
               <button
-                className="p-2 hover:bg-muted rounded-full transition-colors focus-visible-ring"
+                style={{
+                  padding: '8px',
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  borderRadius: '50%',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'background-color 0.2s',
+                  color: '#012F35'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#E2E8F0'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                 aria-label="User menu"
               >
                 <User size={20} />

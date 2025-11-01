@@ -36,18 +36,25 @@ export interface Dataset {
   id: UUID
   name: string
   domain: Domain
+  description?: string
   schema: Record<string, any>
   profile: ProfileSummary
   badge: Badge
+  qualityScore: number // 0-1
   lineage?: string // graph_ref
   owner: UUID // user_ref
   createdAt: Timestamp
   updatedAt: Timestamp
+  lastModified: Timestamp
 }
 
 export interface ProfileSummary {
   totalRows: number
   totalColumns: number
+  completeness: number // 0-1
+  validity: number // 0-1
+  uniqueness: number // 0-1
+  missingValues: number
   nullRate: Record<string, number> // column -> rate
   dupRate: number
   outliers: string[] // column names
