@@ -16,6 +16,7 @@ import {
   Database,
   FileCode
 } from 'lucide-react'
+import { useUIStore } from '@/stores'
 
 interface Message {
   id: string
@@ -79,6 +80,7 @@ const mockSuggestions: Suggestion[] = [
 ]
 
 export function AICopilot() {
+  const { toggleCopilot } = useUIStore()
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -204,6 +206,24 @@ print(f"Valid emails: {df['email_valid'].sum()}/{len(df)}")`
               Powered by GPT-4
             </p>
           </div>
+          <button
+            onClick={toggleCopilot}
+            style={{
+              padding: '8px',
+              backgroundColor: 'transparent',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'background-color 0.2s'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#E2E8F0'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+          >
+            <X size={20} style={{ color: '#64748B' }} />
+          </button>
         </div>
       </div>
 
