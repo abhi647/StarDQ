@@ -30,7 +30,7 @@ export interface DQKPIs {
 // Domain & Dataset Types
 // ============================================================================
 
-export type Domain = 'Sales' | 'Marketing' | 'Ops' | 'Finance' | 'Other'
+export type Domain = 'Sales' | 'Marketing' | 'Ops' | 'Finance' | 'HR' | 'Support' | 'Other'
 
 export interface Dataset {
   id: UUID
